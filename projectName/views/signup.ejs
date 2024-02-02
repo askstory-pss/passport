@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html>
+  <body>
+    <h2>Sign-up</h2>
+    <form action="/signup" method="POST">
+      <div>
+        <label for="username">이름:</label>
+        <input type="text" name="username" id="username" required>
+      </div>
+      <div>
+        <label for="email">이메일:</label>
+        <input type="text" name="email" id="email" required>
+        <button type="button" onclick=checkForDuplicateEmail()>중복확인</button>
+      </div>
+      <div>
+        <label for="employeeNum">사원번호:</label>
+        <input type="text" name="employeeNum" id="employeeNum" required>
+        <button type="button" onclick=checkForDuplicateEmploynum()>중복확인</button>
+      </div>
+      <div>
+        <label for="password">비밀번호:</label>
+        <input type="password" name="password" id="password" onkeyup=validatePassword()>
+        <p id="passwordHint" style="display: none; color: red;">영문 대소문자, 숫자, 특수문자를 3가지 이상 조합하여 8글자 이상이여야 합니다.</p>
+      </div>
+      <div>
+        <label for="passwordCheck">비밀번호확인:</label>
+        <input type="password" name="passwordCheck" id="passwordCheck" required onkeyup="validatePassword()">
+        <p id="passwordMatchHint" style="display: none; color: red;">Passwords do not match.</p>
+      </div>
+      <div>
+        <label for="phoneNum">휴대전화번호:</label>
+        <input type="text" name="phoneNum" id="phoneNum">
+      </div>
+      <div>
+        <button type="submit">Sign-up</button>
+      </div>
+    </form>
+
+    <script>
+      function checkForDuplicateEmail() {
+        const email = document.getElementById('email').value;
+        fetch('/checkDuplicates', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ email: email }),
+        })
+          .then(response => response.json())
+          .then(data => {
+            if (data.isDuplicate) {
+              alert('사용중인 이메일입니다.');
+            }else if(!data.emailRegex){
+              alert('올바르지 않은 형식입니다.');
+            } else {
+              alert('사용가능한 이메일입니다.');
+            }
+          })
+          .catch(error => {
+            console.error('Error checking for duplicates:', error);
+          });
+
+        return false;
+      }
+      
+      function checkForDuplicateEmploynum() {
+        const employeeNum = document.getElementById('employeeNum').value;
+        fetch('/checkDuplicates', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ employeeNum: employeeNum }),
+        })
+          .then(response => response.json())
+          .then(data => {
+            if (data.isDuplicate) {
+              alert('사용중인 사원번호 입니다.');
+            }else if(!data.isNumeric){
+              alert('숫자만 입력해 주세요.');
+            } else {
+              alert('사용가능한 사원번호 입니다.');
+            }
+          })
+          .catch(error => {
+            console.error('Error checking for duplicates:', error);
+          });
+
+        return false;
+      }
+
+      function validatePassword() {
+        var password = document.getElementById("password").value;
+        var hint = document.getElementById("passwordHint");
+        var passwordConfirm = document.getElementById("passwordCheck").value;
+        var matchHint = document.getElementById("passwordMatchHint");
+
+        var upperCase = /[A-Z]/;
+        var lowerCase = /[a-z]/;
+        var numbers = /[0-9]/;
+        var specialChars = /[^A-Za-z0-9]/;
+
+        var count = 0;
+        if(upperCase.test(password)) count++;
+        if(lowerCase.test(password)) count++;
+        if(numbers.test(password)) count++;
+        if(specialChars.test(password)) count++;
+
+        if(password.length >= 8 && count >= 3) {
+            hint.style.display = "none";
+        } else {
+            hint.style.display = "block";
+        }
+
+        if (passwordConfirm.length === 0) {
+          matchHint.style.display = "none";
+        }else if (password !== passwordConfirm) {
+          matchHint.style.display = "block";
+        } else {
+          matchHint.style.display = "none";
+        }
+      }
+    </script>
+    
+  </body>
+</html>
