@@ -119,7 +119,12 @@ function isAuthenticated(req, res, next) {
 }
 
 app.get('/dashboard', isAuthenticated, (req, res) => {
-  res.send('Welcome to the dashboard!');
+  const user = req.user;
+  if (user) {
+    res.json({ user });
+  } else {
+    res.status(404).json({ error: 'User not found' });
+  }
 });
 
 app.post('/checkDuplicates', async (req, res) => {
