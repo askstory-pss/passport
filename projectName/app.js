@@ -61,6 +61,8 @@ passport.deserializeUser((id, done) => {
 });
 
 passport.use(new LocalStrategy((email, password, done) => {
+  console.log(email);
+  console.log(password);
   db.query('SELECT * FROM users WHERE email = ?', [email], (err, rows) => {
     if (err) return done(err);
     if (!rows.length) return done(null, false, { message: 'Incorrect email.' });
