@@ -5,10 +5,12 @@ const session = require('express-session');
 const flash = require('express-flash');
 const bcrypt = require('bcrypt');
 const config = require('./config');
+const cors = require('cors');
 
 const dbConfig = config.database;
 
 const app = express();
+app.use(cors());
 
 // Initialize session middleware
 app.use(session({
